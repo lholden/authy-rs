@@ -1,0 +1,10 @@
+[package]
+name = "authy"
+version = "0.1.0"
+authors = ["Lori Holden <noreply@loriholden.com>"]
+
+[dependencies]
+reqwest = "*"
+serde = "*"
+serde_derive = "*"
+serde_json = "*"
