@@ -3,7 +3,7 @@ use serde_json;
 use error::AuthyError;
 use client::{Client, Status};
 
-const PREFIX: &'static str = "protected/json";
+const PREFIX: &'static str = "protected";
 
 #[derive(Debug, Deserialize)]
 pub struct Details {

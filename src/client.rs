@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use reqwest;
+use reqwest::header::Headers;
 use serde_json;
 
 use error::AuthyError;
@@ -28,16 +29,17 @@ impl Client {
     }
 
     pub fn get(&self, prefix: &str, path: &str) -> Result<serde_json::Value, AuthyError> {
-        let url = format!("{api_url}/{prefix}/{path}?api_key={api_key}",
+        let url = format!("{api_url}/{prefix}/json/{path}",
                           api_url = self.api_url,
                           prefix = prefix,
-                          path = path,
-                          api_key = self.api_key);
+                          path = path);
 
-        let mut res = self.reqwest.get(&url).send()?;
+        let mut headers = Headers::new();
+        headers.set_raw("X-Authy-API-Key", vec![self.api_key.clone().into()]);
+
+        let mut res = self.reqwest.get(&url).headers(headers).send()?;
 
         let body = res.json::<serde_json::Value>()?;
-        println!("BODY: {}", body);
 
         if res.status().is_success() {
             Ok(body)
@@ -48,26 +50,24 @@ impl Client {
     }
 
     pub fn post(&self, prefix: &str, path: &str, params: Option<HashMap<&str, &str>>) -> Result<serde_json::Value, AuthyError> {
-        let url = format!("{api_url}/{prefix}/{path}?api_key={api_key}",
+        let url = format!("{api_url}/{prefix}/json/{path}?api_key",
                           api_url = self.api_url,
                           prefix = prefix,
-                          path = path,
-                          api_key = self.api_key);
+                          path = path);
+
+        let mut headers = Headers::new();
+        headers.set_raw("X-Authy-API-Key", vec![self.api_key.clone().into()]);
 
         let mut res = match params {
             Some(p) => {
-                self.reqwest.post(&url)
-                    .form(&p)
-                    .send()?
+                self.reqwest.post(&url).headers(headers).form(&p).send()?
             },
             None => {
-                self.reqwest.post(&url)
-                    .send()?
+                self.reqwest.post(&url).headers(headers).send()?
             }
         };
 
         let body = res.json::<serde_json::Value>()?;
-        println!("BODY: {}", body);
 
         if res.status().is_success() {
             Ok(body)
