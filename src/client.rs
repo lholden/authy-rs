@@ -1,6 +1,8 @@
 use std::collections::HashMap;
+use std::thread;
+use std::time::Duration;
 
-use reqwest::{self, StatusCode};
+use reqwest::{self, StatusCode, Method};
 use reqwest::header::Headers;
 use serde_json;
 
@@ -8,6 +10,9 @@ use error::AuthyError;
 
 #[derive(Debug)]
 pub struct Client {
+    pub retry_count: u8,
+    pub retry_wait: u16,
+
     api_url: String,
     api_key: String,
     reqwest: reqwest::Client,
@@ -22,6 +27,8 @@ pub struct Status {
 impl Client {
     pub fn new(api_url: &str, api_key: &str) -> Client {
         Client {
+            retry_count: 3,
+            retry_wait: 200,
             api_url: api_url.into(), 
             api_key: api_key.into(),
             reqwest: reqwest::Client::new().expect("A reqwest client"),
@@ -29,20 +36,11 @@ impl Client {
     }
 
     pub fn get(&self, prefix: &str, path: &str) -> Result<serde_json::Value, AuthyError> {
-        self.request(self.reqwest.get(&self.url(prefix, path)))
+        self.request(Method::Get, &self.url(prefix, path), None)
     }
 
     pub fn post(&self, prefix: &str, path: &str, params: Option<HashMap<&str, &str>>) -> Result<serde_json::Value, AuthyError> {
-
-        let url = self.url(prefix, path);
-        match params {
-            Some(p) => {
-                self.request(self.reqwest.post(&url).form(&p))
-            },
-            None => {
-                self.request(self.reqwest.post(&url))
-            }
-        }
+        self.request(Method::Post, &self.url(prefix, path), params)
     }
 
     fn url(&self, prefix: &str, path: &str) -> String {
@@ -52,16 +50,30 @@ impl Client {
                 path = path)
     }
 
-    fn request(&self, request: reqwest::RequestBuilder) -> Result<serde_json::Value, AuthyError> {
-        let mut headers = Headers::new();
-        headers.set_raw("X-Authy-API-Key", vec![self.api_key.clone().into()]);
+    fn request(&self, method: Method, url: &str, params: Option<HashMap<&str, &str>>) -> Result<serde_json::Value, AuthyError> {
+        let mut count = self.retry_count;
+        loop {
+            let mut headers = Headers::new();
+            headers.set_raw("X-Authy-API-Key", vec![self.api_key.clone().into()]);
+            let mut res = match params.clone() {
+                Some(p) => self.reqwest.request(method.clone(), url).headers(headers).form(&p).send()?,
+                None => self.reqwest.request(method.clone(), url).headers(headers).send()?,
+            };
 
-        let mut res = request.headers(headers).send()?;
-
-        match res.status().clone() {
-            StatusCode::Ok => Ok(res.json()?),
-            StatusCode::ServiceUnavailable => Err(AuthyError::ServiceUnavailable),
-            ref s => Err(AuthyError::from_status(s, res.json()?)),
+            match res.status().clone() {
+                StatusCode::Ok => return Ok(res.json()?),
+                StatusCode::ServiceUnavailable => {
+                    if count == 0 {
+                        return Err(AuthyError::ServiceUnavailable);
+                    }
+                    else {
+                        count -= 1;
+                        thread::sleep(Duration::from_millis(self.retry_wait.into()));
+                        continue
+                    }
+                },
+                ref s => return Err(AuthyError::from_status(s, res.json()?)),
+            }
         }
     }
 }
