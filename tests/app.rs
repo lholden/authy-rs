@@ -1,7 +1,7 @@
 extern crate authy;
 
 #[cfg(test)]
-mod test {
+mod app {
     const API_URL: &str = "https://sandbox-api.authy.com";
     const API_KEY: &str = "bf12974d70818a08199d17d5e2bae630";
 
