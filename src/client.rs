@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use reqwest;
+use reqwest::{self, StatusCode};
 use reqwest::header::Headers;
 use serde_json;
 
@@ -29,51 +29,39 @@ impl Client {
     }
 
     pub fn get(&self, prefix: &str, path: &str) -> Result<serde_json::Value, AuthyError> {
-        let url = format!("{api_url}/{prefix}/json/{path}",
-                          api_url = self.api_url,
-                          prefix = prefix,
-                          path = path);
-
-        let mut headers = Headers::new();
-        headers.set_raw("X-Authy-API-Key", vec![self.api_key.clone().into()]);
-
-        let mut res = self.reqwest.get(&url).headers(headers).send()?;
-
-        let body = res.json::<serde_json::Value>()?;
-
-        if res.status().is_success() {
-            Ok(body)
-        }
-        else {
-            Err(AuthyError::from_status(res.status(), serde_json::from_value(body)?))
-        }
+        self.request(self.reqwest.get(&self.url(prefix, path)))
     }
 
     pub fn post(&self, prefix: &str, path: &str, params: Option<HashMap<&str, &str>>) -> Result<serde_json::Value, AuthyError> {
-        let url = format!("{api_url}/{prefix}/json/{path}?api_key",
-                          api_url = self.api_url,
-                          prefix = prefix,
-                          path = path);
 
+        let url = self.url(prefix, path);
+        match params {
+            Some(p) => {
+                self.request(self.reqwest.post(&url).form(&p))
+            },
+            None => {
+                self.request(self.reqwest.post(&url))
+            }
+        }
+    }
+
+    fn url(&self, prefix: &str, path: &str) -> String {
+        format!("{api_url}/{prefix}/json/{path}",
+                api_url = self.api_url,
+                prefix = prefix,
+                path = path)
+    }
+
+    fn request(&self, request: reqwest::RequestBuilder) -> Result<serde_json::Value, AuthyError> {
         let mut headers = Headers::new();
         headers.set_raw("X-Authy-API-Key", vec![self.api_key.clone().into()]);
 
-        let mut res = match params {
-            Some(p) => {
-                self.reqwest.post(&url).headers(headers).form(&p).send()?
-            },
-            None => {
-                self.reqwest.post(&url).headers(headers).send()?
-            }
-        };
+        let mut res = request.headers(headers).send()?;
 
-        let body = res.json::<serde_json::Value>()?;
-
-        if res.status().is_success() {
-            Ok(body)
-        }
-        else {
-            Err(AuthyError::from_status(res.status(), serde_json::from_value(body)?))
+        match res.status().clone() {
+            StatusCode::Ok => Ok(res.json()?),
+            StatusCode::ServiceUnavailable => Err(AuthyError::ServiceUnavailable),
+            ref s => Err(AuthyError::from_status(s, res.json()?)),
         }
     }
 }

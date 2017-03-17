@@ -57,3 +57,11 @@ pub fn status(client: &Client, user_id: u32) -> Result<(Status, UserStatus), Aut
 
     Ok((status, user_status))
 }
+
+pub fn verify(client: &Client, user_id: u32, token: &str) -> Result<Status, AuthyError> {
+    let body = client.get(PREFIX, &format!("verify/{token}/{user_id}", token = token, user_id = user_id))?;
+
+    let status = serde_json::from_value(body.clone())?;
+
+    Ok(status)
+}

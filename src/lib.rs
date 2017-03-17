@@ -1,3 +1,4 @@
+extern crate hyper;
 extern crate reqwest;
 
 #[macro_use]
