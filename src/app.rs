@@ -5,7 +5,7 @@ use client::{Client, Status};
 
 const PREFIX: &'static str = "protected";
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, PartialEq, Deserialize)]
 pub struct Details {
     pub app_id: u32,
     pub name: String,
@@ -14,7 +14,7 @@ pub struct Details {
     pub sms_enabled: bool,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, PartialEq, Deserialize)]
 pub struct Stats {
     pub month: String,
     pub year: u16,

@@ -5,7 +5,8 @@ mod user {
     const API_URL: &str = "https://sandbox-api.authy.com";
     const API_KEY: &str = "bf12974d70818a08199d17d5e2bae630";
 
-    use super::authy::{Client, user};
+    use super::authy::{Client, Status, AuthyError};
+    use super::authy::user;
 
     #[test]
     fn new() {
@@ -15,6 +16,20 @@ mod user {
         assert!(status.success);
     }
 
+
+    #[test]
+    fn new_bad_user() {
+        let c = Client::new(API_URL, API_KEY);
+        let res = user::new(&c, "domain.com", "317-338-9302", "54", false);
+        
+        match res {
+            Err(AuthyError::BadRequest(Status{success, message, ..})) => {
+                assert!(!success);
+                assert_eq!(message, "User was not valid");
+            },
+            _ => unreachable!("Expecting AuthyError::BadRequest"),
+        };
+    }
 
     #[test]
     fn delete() {

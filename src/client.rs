@@ -1,5 +1,6 @@
-use std::collections::HashMap;
 use std::thread;
+use std::io::Read;
+use std::collections::HashMap;
 use std::time::Duration;
 
 use reqwest::{self, StatusCode, Method};
@@ -18,10 +19,12 @@ pub struct Client {
     reqwest: reqwest::Client,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Deserialize)]
 pub struct Status {
     pub success: bool,
     pub message: String,
+
+    pub error_code: Option<String>,
 }
 
 impl Client {
@@ -60,8 +63,11 @@ impl Client {
                 None => self.reqwest.request(method.clone(), url).headers(headers).send()?,
             };
 
+            let mut body = String::new();
+            res.read_to_string(&mut body)?;
+
             match res.status().clone() {
-                StatusCode::Ok => return Ok(res.json()?),
+                StatusCode::Ok => return Ok(serde_json::from_str(&body)?),
                 StatusCode::ServiceUnavailable => {
                     if count == 0 {
                         return Err(AuthyError::ServiceUnavailable);
@@ -72,7 +78,10 @@ impl Client {
                         continue
                     }
                 },
-                ref s => return Err(AuthyError::from_status(s, res.json()?)),
+                StatusCode::TooManyRequests => return Err(AuthyError::TooManyRequests(serde_json::from_str(&body)?)),
+                StatusCode::Unauthorized => return Err(AuthyError::UnauthorizedKey(serde_json::from_str(&body)?)),
+                StatusCode::BadRequest => return Err(AuthyError::BadRequest(serde_json::from_str(&body)?)),
+                s => return Err(AuthyError::UnexpectedStatus(s)),
             }
         }
     }
