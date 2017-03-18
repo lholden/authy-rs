@@ -1,6 +1,5 @@
 use std::thread;
 use std::io::Read;
-use std::collections::HashMap;
 use std::time::Duration;
 
 use reqwest::{self, StatusCode, Method, Url};
@@ -19,7 +18,7 @@ pub struct Client {
     reqwest: reqwest::Client,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Deserialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Status {
     pub success: bool,
     pub message: String,

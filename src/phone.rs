@@ -1,14 +1,13 @@
 use std::fmt::{self, Display};
 
 use serde_json;
-use std::collections::HashMap;
 
 use error::AuthyError;
 use client::{Client, Status};
 
 const PREFIX: &'static str = "protected";
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct PhoneInfo {
     #[serde(rename = "type")]
     pub phone_type: String,
@@ -16,16 +15,16 @@ pub struct PhoneInfo {
     pub ported: bool,
 }
 
-#[derive(Debug)]
-pub enum ContactType {
-    SMS,
-    Call,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct PhoneStart {
     pub is_ported: bool,
     pub is_cellphone: bool,
+}
+
+#[derive(Debug, Clone, Eq, PartialEq)]
+pub enum ContactType {
+    SMS,
+    Call,
 }
 
 impl Display for ContactType {

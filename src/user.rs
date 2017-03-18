@@ -8,12 +8,12 @@ use client::{Client, Status};
 
 const PREFIX: &'static str = "protected";
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct User {
     pub id: u32,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct UserStatus {
     #[serde(rename = "authy_id")]
     pub id: u32,
@@ -28,7 +28,7 @@ pub struct UserStatus {
     pub devices: Vec<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Phone {
     pub cellphone: String,
 
@@ -36,7 +36,7 @@ pub struct Phone {
     pub ignored: Option<bool>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum ActivityType {
     PasswordReset,
     Banned,

@@ -1,5 +1,3 @@
-use std::fmt::{self, Display};
-
 use serde_json;
 use std::collections::HashMap;
 
@@ -8,7 +6,7 @@ use client::{Client, Status};
 
 const PREFIX: &'static str = "onetouch";
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct ApprovalRequest {
     uuid: String,
 }
