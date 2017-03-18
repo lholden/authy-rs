@@ -3,7 +3,7 @@ use std::io::Read;
 use std::collections::HashMap;
 use std::time::Duration;
 
-use reqwest::{self, StatusCode, Method};
+use reqwest::{self, StatusCode, Method, Url};
 use reqwest::header::Headers;
 use serde_json::{self, Value};
 
@@ -38,24 +38,29 @@ impl Client {
         }
     }
 
-    pub fn get(&self, prefix: &str, path: &str) -> Result<(Status, Value), AuthyError> {
-        self.request(Method::Get, &self.url(prefix, path), None)
+    pub fn get(&self, prefix: &str, path: &str, url_params: Option<HashMap<&str, String>>) -> Result<(Status, Value), AuthyError> {
+        self.request(Method::Get, self.url(prefix, path, url_params), None)
     }
 
-    pub fn post(&self, prefix: &str, path: &str, params: Option<HashMap<&str, &str>>) -> Result<(Status, Value), AuthyError> {
-        self.request(Method::Post, &self.url(prefix, path), params)
+    pub fn post(&self, prefix: &str, path: &str, url_params: Option<HashMap<&str, String>>, post_params: Option<HashMap<&str, String>>) -> Result<(Status, Value), AuthyError> {
+        self.request(Method::Post, self.url(prefix, path, url_params), post_params)
     }
 
-    fn url(&self, prefix: &str, path: &str) -> String {
-        format!("{api_url}/{prefix}/json/{path}",
-                api_url = self.api_url,
-                prefix = prefix,
-                path = path)
+    fn url(&self, prefix: &str, path: &str, params: Option<HashMap<&str, String>>) -> Url {
+        let base = format!("{api_url}/{prefix}/json/{path}", 
+                           api_url = self.api_url,
+                           prefix = prefix,
+                           path = path);
+        match params {
+            Some(params) => Url::parse_with_params(&base, params),
+            None => Url::parse(&base),
+        }.expect("Url to be valid")
     }
 
-    fn request(&self, method: Method, url: &str, params: Option<HashMap<&str, &str>>) -> Result<(Status, Value), AuthyError> {
+    fn request(&self, method: Method, url: Url, params: Option<HashMap<&str, String>>) -> Result<(Status, Value), AuthyError> {
         let mut count = self.retry_count;
         loop {
+            let url = url.clone();
             let mut headers = Headers::new();
             headers.set_raw("X-Authy-API-Key", vec![self.api_key.clone().into()]);
             let mut res = match params.clone() {
@@ -78,7 +83,8 @@ impl Client {
                         &StatusCode::Unauthorized => return Err(AuthyError::UnauthorizedKey(status)),
                         &StatusCode::BadRequest => return Err(AuthyError::BadRequest(status)),
                         &StatusCode::NotFound => return Err(AuthyError::UserNotFound(status)),
-                        s => unreachable!("Status code not covered in specification: {}", s),
+                        &StatusCode::InternalServerError => return Err(AuthyError::InternalServerError(status)),
+                        s => panic!("Status code not covered in authy REST specification: {}", s),
                     };
                 },
                 Err(_) => {

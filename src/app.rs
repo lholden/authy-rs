@@ -27,7 +27,7 @@ pub struct Stats {
 }
 
 pub fn details(client: &Client) -> Result<(Status, Details), AuthyError> {
-    let (status, res) = client.get(PREFIX, "app/details")?;
+    let (status, res) = client.get(PREFIX, "app/details", None)?;
 
     let details = serde_json::from_value(res["app"].clone())?;
 
@@ -35,7 +35,7 @@ pub fn details(client: &Client) -> Result<(Status, Details), AuthyError> {
 }
 
 pub fn stats(client: &Client) -> Result<(Status, Vec<Stats>), AuthyError> {
-    let (status, res) = client.get(PREFIX, "app/stats")?;
+    let (status, res) = client.get(PREFIX, "app/stats", None)?;
 
     let stats = serde_json::from_value(res["stats"].clone())?;
 

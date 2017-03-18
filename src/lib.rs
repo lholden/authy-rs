@@ -1,3 +1,5 @@
+#![feature(custom_attribute)]
+
 extern crate reqwest;
 
 #[macro_use]
@@ -12,3 +14,4 @@ pub use client::{Client, Status};
 
 pub mod app;
 pub mod user;
+pub mod phone;

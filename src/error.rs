@@ -12,6 +12,7 @@ pub enum AuthyError {
     UnauthorizedKey(Status),       // 401
     UserNotFound(Status),          // 404
     TooManyRequests(Status),       // 429
+    InternalServerError(Status),   // 500
     ServiceUnavailable,            // 503
 
     IoError(String),
@@ -26,11 +27,12 @@ impl fmt::Display for AuthyError {
         use AuthyError::*;
 
         match *self {
-            BadRequest(ref s) => write!(f, "Bad request: {}", s.message),
+            BadRequest(ref s) => write!(f, "Bad Request: {}", s.message),
             UnauthorizedKey(ref s) => write!(f, "Unauthorized API Key: {}", s.message),
-            UserNotFound(ref s) => write!(f, "User not found: {}", s.message),
-            TooManyRequests(ref s) => write!(f, "Too many requests: {}", s.message),
-            ServiceUnavailable => write!(f, "Service is unavailable"),
+            UserNotFound(ref s) => write!(f, "User Not Found: {}", s.message),
+            TooManyRequests(ref s) => write!(f, "Too Many Requests: {}", s.message),
+            InternalServerError(ref s) => write!(f, "Internal Server Error: {}", s.message),
+            ServiceUnavailable => write!(f, "Service Unavailable reported by authy service"),
             IoError(ref s) => write!(f, "IO Error: {}", s),
             JsonParseError(ref s) => write!(f, "Json parsing error: {}", s),
             RequestError(ref s) => write!(f, "Request error: {}", s),
