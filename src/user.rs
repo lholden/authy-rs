@@ -56,12 +56,12 @@ impl Display for ActivityType {
 }
 
 pub fn new(client: &Client, email: &str, country_code: u16, phone: &str, send_install: bool) -> Result<(Status, User), AuthyError> {
-    let mut params: HashMap<&str, String> = HashMap::new();
-    params.insert("user[email]", email.into());
-    params.insert("user[cellphone]", phone.into());
-    params.insert("user[country_code]", country_code.to_string());
+    let mut params: Vec<(String, String)> = vec![];
+    params.push(("user[email]".into(), email.into()));
+    params.push(("user[cellphone]".into(), phone.into()));
+    params.push(("user[country_code]".into(), country_code.to_string()));
     if send_install {
-        params.insert("send_install_link_via_sms", "true".into());
+        params.push(("send_install_link_via_sms".into(), "true".into()));
     }
 
     let (status, res) = client.post(PREFIX, "users/new", None, Some(params))?;
@@ -92,13 +92,13 @@ pub fn verify(client: &Client, id: u32, token: &str) -> Result<Status, AuthyErro
 }
 
 fn phone(client: &Client, kind: &str, id: u32, force: bool, action: Option<&str>, action_message: Option<&str>) -> Result<(Status, Phone), AuthyError> {
-    let mut params: HashMap<&str, String> = HashMap::new();
-    params.insert("force", force.to_string());
+    let mut params: Vec<(String, String)> = vec![];
+    params.push(("force".into(), force.to_string()));
     if let Some(action) = action {
-        params.insert("action", action.into());
+        params.push(("action".into(), action.into()));
     }
     if let Some(action_message) = action_message {
-        params.insert("action_message", action_message.into());
+        params.push(("action_message".into(), action_message.into()));
     }
 
     let (status, res) = client.get(PREFIX, &format!("{}/{}", kind, id), Some(params))?;
@@ -116,11 +116,18 @@ pub fn call(client: &Client, id: u32, force: bool, action: Option<&str>, action_
     phone(client, "call", id, force, action, action_message)
 }
 
-pub fn register_activity(client: &Client, id: u32, data: &HashMap<&str, String>, activity_type: ActivityType, user_ip: &str) -> Result<Status, AuthyError> {
-    let mut params: HashMap<&str, String> = HashMap::new();
-    params.insert("data", serde_json::to_string(&data)?);
-    params.insert("type", activity_type.to_string());
-    params.insert("user_ip", user_ip.into());
+// TODO: The REST server returns a 500 error for this. Figure out why so it can
+// be re-enabled.
+pub fn register_activity(client: &Client, id: u32, data: Option<&HashMap<&str, String>>, activity_type: ActivityType, user_ip: &str) -> Result<Status, AuthyError> {
+    let mut params: Vec<(String, String)> = vec![];
+    params.push(("type".into(), activity_type.to_string()));
+    params.push(("user_ip".into(), user_ip.into()));
+
+    if let Some(data) = data {
+        for (k, v) in data {
+            params.push((format!("data[{}]", k), v.clone()));
+        }
+    }
 
     let (status, _) = client.post(PREFIX, &format!("users/{}/register_activity", id), None, Some(params))?;
 

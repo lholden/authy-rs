@@ -10,6 +10,7 @@ use client::Status;
 pub enum AuthyError {
     BadRequest(Status),            // 400
     UnauthorizedKey(Status),       // 401
+    Forbidden(Status),             // 403
     UserNotFound(Status),          // 404
     TooManyRequests(Status),       // 429
     InternalServerError(Status),   // 500
@@ -29,6 +30,7 @@ impl fmt::Display for AuthyError {
         match *self {
             BadRequest(ref s) => write!(f, "Bad Request: {}", s.message),
             UnauthorizedKey(ref s) => write!(f, "Unauthorized API Key: {}", s.message),
+            Forbidden(ref s) => write!(f, "Forbidden: {}", s.message),
             UserNotFound(ref s) => write!(f, "User Not Found: {}", s.message),
             TooManyRequests(ref s) => write!(f, "Too Many Requests: {}", s.message),
             InternalServerError(ref s) => write!(f, "Internal Server Error: {}", s.message),

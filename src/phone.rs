@@ -38,11 +38,11 @@ impl Display for ContactType {
 }
 
 pub fn info(client: &Client, country_code: u16, phone: &str, user_ip: Option<&str>) -> Result<(Status, PhoneInfo), AuthyError> {
-    let mut params: HashMap<&str, String> = HashMap::new();
-    params.insert("country_code", country_code.to_string());
-    params.insert("phone_number", phone.into());
+    let mut params: Vec<(String, String)> = vec![];
+    params.push(("country_code".into(), country_code.to_string()));
+    params.push(("phone_number".into(), phone.into()));
     if let Some(user_ip) = user_ip {
-        params.insert("user_ip", user_ip.into());
+        params.push(("user_ip".into(), user_ip.into()));
     };
 
     let (status, res) = client.get(PREFIX, "phones/info", Some(params))?;
@@ -53,15 +53,15 @@ pub fn info(client: &Client, country_code: u16, phone: &str, user_ip: Option<&st
 }
 
 pub fn start(client: &Client, via: ContactType, country_code: u16, phone: &str, code_length: Option<u8>, locale: Option<&str>) -> Result<(Status, PhoneStart), AuthyError> {
-    let mut params: HashMap<&str, String> = HashMap::new();
-    params.insert("via", via.to_string());
-    params.insert("country_code", country_code.to_string());
-    params.insert("phone_number", phone.into());
+    let mut params: Vec<(String, String)> = vec![];
+    params.push(("via".into(), via.to_string()));
+    params.push(("country_code".into(), country_code.to_string()));
+    params.push(("phone_number".into(), phone.into()));
     if let Some(code_length) = code_length {
-        params.insert("code_length", code_length.to_string());
+        params.push(("code_length".into(), code_length.to_string()));
     };
     if let Some(locale) = locale {
-        params.insert("locale", locale.into());
+        params.push(("locale".into(), locale.into()));
     };
 
     let (status, res) = client.post(PREFIX, "phones/verification/start", None, Some(params))?;
@@ -71,10 +71,10 @@ pub fn start(client: &Client, via: ContactType, country_code: u16, phone: &str, 
 }
 
 pub fn check(client: &Client, country_code: u16, phone: &str, code: &str) -> Result<Status, AuthyError> {
-    let mut params: HashMap<&str, String> = HashMap::new();
-    params.insert("country_code", country_code.to_string());
-    params.insert("phone_number", phone.into());
-    params.insert("verification_code", code.into());
+    let mut params: Vec<(String, String)> = vec![];
+    params.push(("country_code".into(), country_code.to_string()));
+    params.push(("phone_number".into(), phone.into()));
+    params.push(("verification_code".into(), code.into()));
 
     let (status, _) = client.get(PREFIX, "phones/verification/check", Some(params))?;
 

@@ -1,6 +1,5 @@
 extern crate authy;
 
-
 #[cfg(test)]
 mod user {
     const API_URL: &str = "https://sandbox-api.authy.com";
@@ -144,8 +143,8 @@ mod user {
         assert_eq!(sms.cellphone, "+54-XXX-XXX-XX02");
     }
 
+    /*
     #[test]
-    #[ignore]
     // TODO: Work out why authy is returning a 500 error when encountering this
     fn register_activity() {
         let c = Client::new(API_URL, API_KEY);
@@ -156,7 +155,8 @@ mod user {
         let mut data: HashMap<&str, String> = HashMap::new();
         data.insert("my_user_id", "1234".into());
 
-        let status = user::register_activity(&c, user.id, &data, ActivityType::PasswordReset, "192.168.0.1").expect("Status");
+        let status = user::register_activity(&c, user.id, Some(&data), ActivityType::PasswordReset, "192.168.0.1").expect("Status");
         assert!(status.success);
     }
+    */
 }

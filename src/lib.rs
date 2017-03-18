@@ -15,3 +15,4 @@ pub use client::{Client, Status};
 pub mod app;
 pub mod user;
 pub mod phone;
+pub mod onetouch;

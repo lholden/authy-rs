@@ -38,15 +38,15 @@ impl Client {
         }
     }
 
-    pub fn get(&self, prefix: &str, path: &str, url_params: Option<HashMap<&str, String>>) -> Result<(Status, Value), AuthyError> {
+    pub fn get(&self, prefix: &str, path: &str, url_params: Option<Vec<(String, String)>>) -> Result<(Status, Value), AuthyError> {
         self.request(Method::Get, self.url(prefix, path, url_params), None)
     }
 
-    pub fn post(&self, prefix: &str, path: &str, url_params: Option<HashMap<&str, String>>, post_params: Option<HashMap<&str, String>>) -> Result<(Status, Value), AuthyError> {
+    pub fn post(&self, prefix: &str, path: &str, url_params: Option<Vec<(String, String)>>, post_params: Option<Vec<(String, String)>>) -> Result<(Status, Value), AuthyError> {
         self.request(Method::Post, self.url(prefix, path, url_params), post_params)
     }
 
-    fn url(&self, prefix: &str, path: &str, params: Option<HashMap<&str, String>>) -> Url {
+    fn url(&self, prefix: &str, path: &str, params: Option<Vec<(String, String)>>) -> Url {
         let base = format!("{api_url}/{prefix}/json/{path}", 
                            api_url = self.api_url,
                            prefix = prefix,
@@ -57,7 +57,7 @@ impl Client {
         }.expect("Url to be valid")
     }
 
-    fn request(&self, method: Method, url: Url, params: Option<HashMap<&str, String>>) -> Result<(Status, Value), AuthyError> {
+    fn request(&self, method: Method, url: Url, params: Option<Vec<(String, String)>>) -> Result<(Status, Value), AuthyError> {
         let mut count = self.retry_count;
         loop {
             let url = url.clone();
@@ -70,6 +70,7 @@ impl Client {
 
             let mut body = String::new();
             res.read_to_string(&mut body)?;
+            println!("{}", body);
 
             // I wish could just check the content type but authy mixes json
             // and html content types when returning valid json.
@@ -79,9 +80,10 @@ impl Client {
 
                     match res.status() {
                         &StatusCode::Ok => return Ok((status, value)),
-                        &StatusCode::TooManyRequests => return Err(AuthyError::TooManyRequests(status)),
-                        &StatusCode::Unauthorized => return Err(AuthyError::UnauthorizedKey(status)),
                         &StatusCode::BadRequest => return Err(AuthyError::BadRequest(status)),
+                        &StatusCode::Unauthorized => return Err(AuthyError::UnauthorizedKey(status)),
+                        &StatusCode::Forbidden => return Err(AuthyError::Forbidden(status)),
+                        &StatusCode::TooManyRequests => return Err(AuthyError::TooManyRequests(status)),
                         &StatusCode::NotFound => return Err(AuthyError::UserNotFound(status)),
                         &StatusCode::InternalServerError => return Err(AuthyError::InternalServerError(status)),
                         s => panic!("Status code not covered in authy REST specification: {}", s),
