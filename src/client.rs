@@ -5,7 +5,7 @@ use std::time::Duration;
 
 use reqwest::{self, StatusCode, Method};
 use reqwest::header::Headers;
-use serde_json;
+use serde_json::{self, Value};
 
 use error::AuthyError;
 
@@ -38,11 +38,11 @@ impl Client {
         }
     }
 
-    pub fn get(&self, prefix: &str, path: &str) -> Result<serde_json::Value, AuthyError> {
+    pub fn get(&self, prefix: &str, path: &str) -> Result<(Status, Value), AuthyError> {
         self.request(Method::Get, &self.url(prefix, path), None)
     }
 
-    pub fn post(&self, prefix: &str, path: &str, params: Option<HashMap<&str, &str>>) -> Result<serde_json::Value, AuthyError> {
+    pub fn post(&self, prefix: &str, path: &str, params: Option<HashMap<&str, &str>>) -> Result<(Status, Value), AuthyError> {
         self.request(Method::Post, &self.url(prefix, path), params)
     }
 
@@ -53,7 +53,7 @@ impl Client {
                 path = path)
     }
 
-    fn request(&self, method: Method, url: &str, params: Option<HashMap<&str, &str>>) -> Result<serde_json::Value, AuthyError> {
+    fn request(&self, method: Method, url: &str, params: Option<HashMap<&str, &str>>) -> Result<(Status, Value), AuthyError> {
         let mut count = self.retry_count;
         loop {
             let mut headers = Headers::new();
@@ -66,24 +66,37 @@ impl Client {
             let mut body = String::new();
             res.read_to_string(&mut body)?;
 
-            match res.status().clone() {
-                StatusCode::Ok => return Ok(serde_json::from_str(&body)?),
-                StatusCode::ServiceUnavailable => {
-                    if count == 0 {
-                        return Err(AuthyError::ServiceUnavailable);
-                    }
-                    else {
-                        count -= 1;
-                        thread::sleep(Duration::from_millis(self.retry_wait.into()));
-                        continue
+            // I wish could just check the content type but authy mixes json
+            // and html content types when returning valid json.
+            match serde_json::from_str::<Value>(&body) {
+                Ok(value) => {
+                    let status: Status = serde_json::from_str(&body)?;
+
+                    match res.status() {
+                        &StatusCode::Ok => return Ok((status, value)),
+                        &StatusCode::TooManyRequests => return Err(AuthyError::TooManyRequests(status)),
+                        &StatusCode::Unauthorized => return Err(AuthyError::UnauthorizedKey(status)),
+                        &StatusCode::BadRequest => return Err(AuthyError::BadRequest(status)),
+                        &StatusCode::NotFound => return Err(AuthyError::UserNotFound(status)),
+                        s => unreachable!("Status code not covered in specification: {}", s),
+                    };
+                },
+                Err(_) => {
+                    match res.status() {
+                        &StatusCode::ServiceUnavailable => {
+                            if count == 0 {
+                                return Err(AuthyError::ServiceUnavailable);
+                            }
+                            else {
+                                count -= 1;
+                                thread::sleep(Duration::from_millis(self.retry_wait.into()));
+                                continue;
+                            }
+                        },
+                        _ => return Err(AuthyError::InvalidServerResponse),
                     }
                 },
-                StatusCode::TooManyRequests => return Err(AuthyError::TooManyRequests(serde_json::from_str(&body)?)),
-                StatusCode::Unauthorized => return Err(AuthyError::UnauthorizedKey(serde_json::from_str(&body)?)),
-                StatusCode::BadRequest => return Err(AuthyError::BadRequest(serde_json::from_str(&body)?)),
-                StatusCode::NotFound => return Err(AuthyError::UserNotFound(serde_json::from_str(&body)?)),
-                s => return Err(AuthyError::UnexpectedStatus(s)),
-            }
+            };
         }
     }
 }

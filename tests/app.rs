@@ -26,7 +26,9 @@ mod app {
                 assert!(!success);
                 assert_eq!(message, "Invalid API key");
             },
-            _ => unreachable!("Expecting AuthyError::UnauthorizedKey"),
+            other => {
+                unreachable!("Expecting AuthyError::UnauthorizedKey: {:?}", other);
+            },
         };
     }
 

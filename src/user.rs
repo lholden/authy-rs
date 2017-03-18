@@ -34,34 +34,29 @@ pub fn new(client: &Client, email: &str, phone: &str, country: &str, send_instal
         params.insert("send_install_link_via_sms", "true");
     }
 
-    let body = client.post(PREFIX, "users/new", Some(params))?;
+    let (status, res) = client.post(PREFIX, "users/new", Some(params))?;
 
-    let status = serde_json::from_value(body.clone())?;
-    let user = serde_json::from_value(body["user"].clone())?;
+    let user = serde_json::from_value(res["user"].clone())?;
 
     Ok((status, user))
 }
 
 pub fn delete(client: &Client, user_id: u32) -> Result<Status, AuthyError> {
-    let body = client.post(PREFIX, &format!("users/{}/delete", user_id), None)?;
+    let (status, _) = client.post(PREFIX, &format!("users/{}/delete", user_id), None)?;
 
-    let status = serde_json::from_value(body.clone())?;
     Ok(status)
 }
 
 pub fn status(client: &Client, user_id: u32) -> Result<(Status, UserStatus), AuthyError> {
-    let body = client.get(PREFIX, &format!("users/{}/status", user_id))?;
+    let (status, res) = client.get(PREFIX, &format!("users/{}/status", user_id))?;
 
-    let status = serde_json::from_value(body.clone())?;
-    let user_status = serde_json::from_value(body["status"].clone())?;
+    let user_status = serde_json::from_value(res["status"].clone())?;
 
     Ok((status, user_status))
 }
 
 pub fn verify(client: &Client, user_id: u32, token: &str) -> Result<Status, AuthyError> {
-    let body = client.get(PREFIX, &format!("verify/{token}/{user_id}", token = token, user_id = user_id))?;
-
-    let status = serde_json::from_value(body.clone())?;
+    let (status, _) = client.get(PREFIX, &format!("verify/{token}/{user_id}", token = token, user_id = user_id))?;
 
     Ok(status)
 }

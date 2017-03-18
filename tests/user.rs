@@ -27,7 +27,7 @@ mod user {
                 assert!(!success);
                 assert_eq!(message, "User was not valid");
             },
-            _ => unreachable!("Expecting AuthyError::BadRequest"),
+            o => unreachable!("Expecting AuthyError::BadRequest, got: {:?}", o),
         };
     }
 
@@ -51,7 +51,7 @@ mod user {
                 assert!(!success);
                 assert_eq!(message, "User not found.");
             },
-            _ => unreachable!("Expecting AuthyError::UserNotFound"),
+            o => unreachable!("Expecting AuthyError::UserNotFound, got: {:?}", o),
         };
     }
 
@@ -90,7 +90,7 @@ mod user {
                 assert!(!success);
                 assert_eq!(message, "Token is invalid");
             },
-            _ => unreachable!("Expecting AuthyError::UnauthorizedKey"),
+            o => unreachable!("Expecting AuthyError::UnauthorizedKey, got: {:?}", o),
         };
     }
 

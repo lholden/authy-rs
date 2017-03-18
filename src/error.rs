@@ -1,7 +1,7 @@
 use std::io;
 use std::fmt;
 
-use reqwest::{self, StatusCode};
+use reqwest;
 use serde_json;
 
 use client::Status;
@@ -13,11 +13,11 @@ pub enum AuthyError {
     UserNotFound(Status),          // 404
     TooManyRequests(Status),       // 429
     ServiceUnavailable,            // 503
-    UnexpectedStatus(StatusCode),  // Other
 
     IoError(String),
     JsonParseError(String),
     RequestError(String),
+    InvalidServerResponse,
 }
 
 
@@ -31,10 +31,10 @@ impl fmt::Display for AuthyError {
             UserNotFound(ref s) => write!(f, "User not found: {}", s.message),
             TooManyRequests(ref s) => write!(f, "Too many requests: {}", s.message),
             ServiceUnavailable => write!(f, "Service is unavailable"),
-            UnexpectedStatus(ref s) => write!(f, "Unexpected status code: {}", s.to_string()),
             IoError(ref s) => write!(f, "IO Error: {}", s),
             JsonParseError(ref s) => write!(f, "Json parsing error: {}", s),
             RequestError(ref s) => write!(f, "Request error: {}", s),
+            InvalidServerResponse => write!(f, "Server returned an invalid response"),
         }
     }
 }
