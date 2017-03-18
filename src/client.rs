@@ -81,6 +81,7 @@ impl Client {
                 StatusCode::TooManyRequests => return Err(AuthyError::TooManyRequests(serde_json::from_str(&body)?)),
                 StatusCode::Unauthorized => return Err(AuthyError::UnauthorizedKey(serde_json::from_str(&body)?)),
                 StatusCode::BadRequest => return Err(AuthyError::BadRequest(serde_json::from_str(&body)?)),
+                StatusCode::NotFound => return Err(AuthyError::UserNotFound(serde_json::from_str(&body)?)),
                 s => return Err(AuthyError::UnexpectedStatus(s)),
             }
         }

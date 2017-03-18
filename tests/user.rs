@@ -42,6 +42,20 @@ mod user {
     }
 
     #[test]
+    fn delete_bad_user() {
+        let c = Client::new(API_URL, API_KEY);
+        let res = user::delete(&c, 0);
+
+        match res {
+            Err(AuthyError::UserNotFound(Status{success, message, ..})) => {
+                assert!(!success);
+                assert_eq!(message, "User not found.");
+            },
+            _ => unreachable!("Expecting AuthyError::UserNotFound"),
+        };
+    }
+
+    #[test]
     fn status() {
         let c = Client::new(API_URL, API_KEY);
         let (status, user) = user::new(&c, "user@domain.com", "317-338-9302", "54", false).expect("User to be created");
@@ -61,8 +75,23 @@ mod user {
 
         let status = user::verify(&c, user.id, "0000000").expect("Valid token");
         assert!(status.success);
-
-        let status = user::verify(&c, user.id, "12345");
-        assert!(status.is_err());
     }
+
+    #[test]
+    fn verify_invalid_token() {
+        let c = Client::new(API_URL, API_KEY);
+        let (status, user) = user::new(&c, "user@domain.com", "317-338-9302", "54", false).expect("User to be created");
+        assert!(status.success);
+
+        let res = user::verify(&c, user.id, "123456");
+
+        match res {
+            Err(AuthyError::UnauthorizedKey(Status{success, message, ..})) => {
+                assert!(!success);
+                assert_eq!(message, "Token is invalid");
+            },
+            _ => unreachable!("Expecting AuthyError::UnauthorizedKey"),
+        };
+    }
+
 }
