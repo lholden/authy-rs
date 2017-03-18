@@ -2,8 +2,8 @@ extern crate authy;
 
 #[cfg(test)]
 mod phone {
-    const API_URL: &str = "https://sandbox-api.authy.com";
-    const API_KEY: &str = "bf12974d70818a08199d17d5e2bae630";
+    const API_URL: &'static str = "https://sandbox-api.authy.com";
+    const API_KEY: &'static str = "bf12974d70818a08199d17d5e2bae630";
 
     use super::authy::{Client, Status, AuthyError};
     use super::authy::api::phone::{self, ContactType};
