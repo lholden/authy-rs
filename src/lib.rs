@@ -46,7 +46,6 @@
 //!     user.sms(&c, true, Some("login"), Some("Authy documentation example login")).unwrap();
 //! }
 //! ```
-#![feature(custom_attribute)]
 
 extern crate reqwest;
 

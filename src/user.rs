@@ -30,7 +30,7 @@ impl User {
     }
 
     pub fn find(c: &Client, id: u32) -> Result<User, AuthyError> {
-        let mut u = User { id, ..User::default() };
+        let mut u = User { id: id, ..User::default() };
         u.update(c)?;
         Ok(u)
     }

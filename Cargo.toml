@@ -1,6 +1,6 @@
 [package]
 name = "authy"
-version = "0.9.0"
+version = "0.9.1"
 authors = ["Lori Holden <noreply@loriholden.com>"]
 description = "Bindings for the Authy two factor web service."
 
