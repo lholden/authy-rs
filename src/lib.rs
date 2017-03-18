@@ -1,5 +1,5 @@
 //! # Authy
-//! [![](https://docs.rs/authy/badge.svg)](https://docs.rs/authy) [![](https://img.shields.io/crates/v/authy.svg)](https://crates.io/crates/authy) [![](https://img.shields.io/crates/l/authy.svg)](https://raw.githubusercontent.com/lholden/authy-rs/master/LICENSE) [![](https://travis-ci.org/lholden/authy.svg?branch=master)](https://travis-ci.org/lholden/authy)
+//! [![](https://docs.rs/authy/badge.svg)](https://docs.rs/authy) [![](https://img.shields.io/crates/v/authy.svg)](https://crates.io/crates/authy) [![](https://img.shields.io/crates/l/authy.svg)](https://raw.githubusercontent.com/lholden/authy-rs/master/LICENSE) [![](https://travis-ci.org/lholden/authy-rs.svg?branch=master)](https://travis-ci.org/lholden/authy-rs)
 //!
 //! Bindings for the Authy two factor web service
 //!
