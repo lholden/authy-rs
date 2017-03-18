@@ -10,7 +10,8 @@ mod phone {
 
     #[test]
     fn info() {
-        let c = Client::new(API_URL, API_KEY);
+        let mut c = Client::new(API_URL, API_KEY);
+        c.retry_wait = 1000;
         let (status, info) = phone::info(&c, 54, "317-338-9302", None).expect("PhoneInfo");
         assert!(status.success);
         assert_eq!(info.phone_type, "landline");
@@ -22,7 +23,8 @@ mod phone {
 
     #[test]
     fn start_sms() {
-        let c = Client::new(API_URL, API_KEY);
+        let mut c = Client::new(API_URL, API_KEY);
+        c.retry_wait = 1000;
         let (status, info) = phone::start(&c, ContactType::SMS, 54, "317-338-9302", None, None).expect("PhoneVerification");
         assert!(status.success);
         assert!(! info.is_ported);
@@ -31,7 +33,8 @@ mod phone {
 
     #[test]
     fn start_fail() {
-        let c = Client::new(API_URL, API_KEY);
+        let mut c = Client::new(API_URL, API_KEY);
+        c.retry_wait = 1000;
         let res = phone::start(&c, ContactType::Call, 54, "555-9302", None, None);
 
         match res {
@@ -48,7 +51,8 @@ mod phone {
     // Gave up - This fails on sandbox because the verification start
     // doesn't actually kick off a verification.
     fn check() {
-        let c = Client::new(API_URL, API_KEY);
+        let mut c = Client::new(API_URL, API_KEY);
+        c.retry_wait = 1000;
         let (status, _) = phone::start(&c, ContactType::Call, 54, "317-555-9302", None, None).expect("PhoneVerification");
         assert!(status.success);
 
