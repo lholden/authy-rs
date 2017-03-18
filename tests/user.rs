@@ -143,9 +143,9 @@ mod user {
         assert_eq!(sms.cellphone, "+54-XXX-XXX-XX02");
     }
 
-    /*
     #[test]
-    // TODO: Work out why authy is returning a 500 error when encountering this
+    #[ignore]
+    // This works with my real API key, just not on the sandbox
     fn register_activity() {
         let c = Client::new(API_URL, API_KEY);
         let (status, user) = user::new(&c, "user@domain.com", 54, "317-338-9302", false).expect("User to be created");
@@ -158,5 +158,4 @@ mod user {
         let status = user::register_activity(&c, user.id, Some(&data), ActivityType::PasswordReset, "192.168.0.1").expect("Status");
         assert!(status.success);
     }
-    */
 }
