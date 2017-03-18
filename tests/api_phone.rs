@@ -11,7 +11,7 @@ mod phone {
     #[test]
     fn info() {
         let mut c = Client::new(API_URL, API_KEY);
-        c.retry_wait = 1000;
+        c.retry_wait = 3000;
         let (status, info) = phone::info(&c, 54, "317-338-9302", None).expect("PhoneInfo");
         assert!(status.success);
         assert_eq!(info.phone_type, "landline");
@@ -24,7 +24,7 @@ mod phone {
     #[test]
     fn start_sms() {
         let mut c = Client::new(API_URL, API_KEY);
-        c.retry_wait = 1000;
+        c.retry_wait = 3000;
         let (status, info) = phone::start(&c, ContactType::SMS, 54, "317-338-9302", None, None).expect("PhoneVerification");
         assert!(status.success);
         assert!(! info.is_ported);
@@ -34,7 +34,7 @@ mod phone {
     #[test]
     fn start_fail() {
         let mut c = Client::new(API_URL, API_KEY);
-        c.retry_wait = 1000;
+        c.retry_wait = 3000;
         let res = phone::start(&c, ContactType::Call, 54, "555-9302", None, None);
 
         match res {
@@ -52,7 +52,7 @@ mod phone {
     // doesn't actually kick off a verification.
     fn check() {
         let mut c = Client::new(API_URL, API_KEY);
-        c.retry_wait = 1000;
+        c.retry_wait = 3000;
         let (status, _) = phone::start(&c, ContactType::Call, 54, "317-555-9302", None, None).expect("PhoneVerification");
         assert!(status.success);
 

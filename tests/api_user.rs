@@ -13,7 +13,7 @@ mod user {
     #[test]
     fn new() {
         let mut c = Client::new(API_URL, API_KEY);
-        c.retry_wait = 1000;
+        c.retry_wait = 3000;
         let (status, _) = user::new(&c, "user@domain.com", 54, "317-338-9302", false).expect("User to be created");
 
         assert!(status.success);
@@ -22,7 +22,7 @@ mod user {
     #[test]
     fn new_bad_user() {
         let mut c = Client::new(API_URL, API_KEY);
-        c.retry_wait = 1000;
+        c.retry_wait = 3000;
         let res = user::new(&c, "domain.com", 54, "317-338-9302", false);
         
         match res {
@@ -37,7 +37,7 @@ mod user {
     #[test]
     fn delete() {
         let mut c = Client::new(API_URL, API_KEY);
-        c.retry_wait = 1000;
+        c.retry_wait = 3000;
         let (status, user) = user::new(&c, "user2341@domain.com", 54, "317-338-2341", false).expect("User to be created");
         assert!(status.success);
 
@@ -48,7 +48,7 @@ mod user {
     #[test]
     fn delete_bad_user() {
         let mut c = Client::new(API_URL, API_KEY);
-        c.retry_wait = 1000;
+        c.retry_wait = 3000;
         let res = user::delete(&c, 0);
 
         match res {
@@ -63,7 +63,7 @@ mod user {
     #[test]
     fn status() {
         let mut c = Client::new(API_URL, API_KEY);
-        c.retry_wait = 1000;
+        c.retry_wait = 3000;
         let (status, user) = user::new(&c, "user@domain.com", 54, "317-338-9302", false).expect("User to be created");
         assert!(status.success);
 
@@ -76,7 +76,7 @@ mod user {
     #[test]
     fn verify() {
         let mut c = Client::new(API_URL, API_KEY);
-        c.retry_wait = 1000;
+        c.retry_wait = 3000;
         let (status, user) = user::new(&c, "user@domain.com", 54, "317-338-9302", false).expect("User to be created");
         assert!(status.success);
 
@@ -87,7 +87,7 @@ mod user {
     #[test]
     fn verify_invalid_token() {
         let mut c = Client::new(API_URL, API_KEY);
-        c.retry_wait = 1000;
+        c.retry_wait = 3000;
         let (status, user) = user::new(&c, "user@domain.com", 54, "317-338-9302", false).expect("User to be created");
         assert!(status.success);
 
@@ -105,7 +105,7 @@ mod user {
     #[test]
     fn sms() {
         let mut c = Client::new(API_URL, API_KEY);
-        c.retry_wait = 1000;
+        c.retry_wait = 3000;
         let (status, user) = user::new(&c, "user@domain.com", 54, "317-338-9302", false).expect("User to be created");
         assert!(status.success);
 
@@ -118,7 +118,7 @@ mod user {
     #[test]
     fn sms_action() {
         let mut c = Client::new(API_URL, API_KEY);
-        c.retry_wait = 1000;
+        c.retry_wait = 3000;
         let (status, user) = user::new(&c, "user@domain.com", 54, "317-338-9302", false).expect("User to be created");
         assert!(status.success);
 
@@ -131,7 +131,7 @@ mod user {
     #[test]
     fn call() {
         let mut c = Client::new(API_URL, API_KEY);
-        c.retry_wait = 1000;
+        c.retry_wait = 3000;
         let (status, user) = user::new(&c, "user@domain.com", 54, "317-338-9302", false).expect("User to be created");
         assert!(status.success);
 
@@ -144,7 +144,7 @@ mod user {
     #[test]
     fn call_action() {
         let mut c = Client::new(API_URL, API_KEY);
-        c.retry_wait = 1000;
+        c.retry_wait = 3000;
         let (status, user) = user::new(&c, "user@domain.com", 54, "317-338-9302", false).expect("User to be created");
         assert!(status.success);
 
@@ -159,7 +159,7 @@ mod user {
     // This works with my real API key, just not on the sandbox
     fn register_activity() {
         let mut c = Client::new(API_URL, API_KEY);
-        c.retry_wait = 1000;
+        c.retry_wait = 3000;
         let (status, user) = user::new(&c, "user@domain.com", 54, "317-338-9302", false).expect("User to be created");
         assert!(status.success);
 

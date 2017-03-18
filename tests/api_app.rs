@@ -11,7 +11,7 @@ mod api_app {
     #[test]
     fn details() {
         let mut c = Client::new(API_URL, API_KEY);
-        c.retry_wait = 1000;
+        c.retry_wait = 3000;
         let (status, details) = app::details(&c).expect("Details of authy app");
         assert!(status.success);
         assert_eq!(details.name, "Sandbox App 1");
@@ -20,7 +20,7 @@ mod api_app {
     #[test]
     fn details_bad_key() {
         let mut c = Client::new(API_URL, "a_bad_key");
-        c.retry_wait = 1000;
+        c.retry_wait = 3000;
         let res = app::details(&c);
 
         match res {
@@ -37,7 +37,7 @@ mod api_app {
     #[test]
     fn stats() {
         let mut c = Client::new(API_URL, API_KEY);
-        c.retry_wait = 1000;
+        c.retry_wait = 3000;
         let (status, stats) = app::stats(&c).expect("Stats of authy app");
         assert!(status.success);
         stats.iter().find(|s| s.month == "February" && s.year == 2017).expect("Find Feb of 2017");

@@ -14,7 +14,7 @@ mod onetouch {
     // sandbox key has onetouch forbidden
     fn request() {
         let mut c = Client::new(API_URL, API_KEY);
-        c.retry_wait = 1000;
+        c.retry_wait = 3000;
         let (status, user) = user::new(&c, "user@domain.com", 54, "317-338-9302", false).expect("User to be created");
         assert!(status.success);
 
