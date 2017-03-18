@@ -1,8 +1,11 @@
 # Authy
+[![](https://docs.rs/authy/badge.svg)](https://docs.rs/authy) [![](https://img.shields.io/crates/v/authy.svg)](https://crates.io/crates/authy) [![](https://img.shields.io/crates/l/authy.svg)](https://raw.githubusercontent.com/lholden/authy/master/LICENSE)
 
 Bindings for the Authy two factor web service
 
 ## Usage
+
+Please see the [Documentation](https://docs.rs/authy) for more details.
 
 You will need your API key for your application on [authy.com](https://authy.com).
 
