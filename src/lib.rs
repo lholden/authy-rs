@@ -40,8 +40,9 @@
 //!     }
 //!
 //!     // Lets send out a sms token just for fun
+//!     // Must be using a real API key on the production authy server for this to
+//!     // actually send out anything.
 //!     user.sms(&c, true, Some("login"), Some("Authy documentation example login")).unwrap();
-//!
 //! }
 //! ```
 #![feature(custom_attribute)]
