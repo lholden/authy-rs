@@ -6,8 +6,8 @@ mod onetouch {
     const API_KEY: &str = "bf12974d70818a08199d17d5e2bae630";
 
     use super::authy::Client;
-    use super::authy::user;
-    use super::authy::onetouch;
+    use super::authy::api::user;
+    use super::authy::api::onetouch;
 
     #[test]
     #[ignore]

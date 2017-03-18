@@ -8,7 +8,7 @@ mod user {
     use std::collections::HashMap;
 
     use super::authy::{Client, Status, AuthyError};
-    use super::authy::user::{self, ActivityType};
+    use super::authy::api::user::{self, ActivityType};
 
     #[test]
     fn new() {

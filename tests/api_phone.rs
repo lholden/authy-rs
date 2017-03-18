@@ -6,7 +6,7 @@ mod phone {
     const API_KEY: &str = "bf12974d70818a08199d17d5e2bae630";
 
     use super::authy::{Client, Status, AuthyError};
-    use super::authy::phone::{self, ContactType};
+    use super::authy::api::phone::{self, ContactType};
 
     #[test]
     fn info() {

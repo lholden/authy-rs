@@ -1,81 +1,42 @@
-use std::fmt::{self, Display};
-
-use serde_json;
-
 use error::AuthyError;
-use client::{Client, Status};
+use client::Client;
+use api;
+pub use api::phone::{ContactType, PhoneStart};
 
-const PREFIX: &'static str = "protected";
-
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
-pub struct PhoneInfo {
-    #[serde(rename = "type")]
+#[derive(Debug, Clone, Default, Eq, PartialEq, Serialize, Deserialize)]
+pub struct Phone {
+    pub country_code: u16,
+    pub phone_number: String,
     pub phone_type: String,
     pub provider: String,
     pub ported: bool,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
-pub struct PhoneStart {
-    pub is_ported: bool,
-    pub is_cellphone: bool,
-}
+impl Phone {
+    pub fn find(c: &Client, country_code: u16, phone: &str) -> Result<Phone, AuthyError> {
+        let (status, info) = api::phone::info(c, country_code, phone, None)?;
+        assert!(status.success);
 
-#[derive(Debug, Clone, Eq, PartialEq)]
-pub enum ContactType {
-    SMS,
-    Call,
-}
-
-impl Display for ContactType {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            ContactType::SMS => write!(f, "sms"),
-            ContactType::Call => write!(f, "call")
-        } 
+        Ok(Phone {
+            country_code: country_code,
+            phone_number: phone.into(),
+            phone_type: info.phone_type, 
+            provider: info.provider, 
+            ported: info.ported
+        })
     }
-}
 
-pub fn info(client: &Client, country_code: u16, phone: &str, user_ip: Option<&str>) -> Result<(Status, PhoneInfo), AuthyError> {
-    let mut params: Vec<(String, String)> = vec![];
-    params.push(("country_code".into(), country_code.to_string()));
-    params.push(("phone_number".into(), phone.into()));
-    if let Some(user_ip) = user_ip {
-        params.push(("user_ip".into(), user_ip.into()));
-    };
+    pub fn start(&self, c: &Client, via: ContactType, code_length: Option<u8>, locale: Option<&str>) -> Result<PhoneStart, AuthyError> {
+        let (status, phone_start) = api::phone::start(c, via, self.country_code, &self.phone_number, code_length, locale)?;
+        assert!(status.success);
 
-    let (status, res) = client.get(PREFIX, "phones/info", Some(params))?;
+        Ok(phone_start)
+    }
 
-    let phone_info = serde_json::from_value(res)?;
+    pub fn check(&self, c: &Client, code: &str) -> Result<(), AuthyError> {
+        let status = api::phone::check(c, self.country_code, &self.phone_number, code)?;
+        assert!(status.success);
 
-    Ok((status, phone_info))
-}
-
-pub fn start(client: &Client, via: ContactType, country_code: u16, phone: &str, code_length: Option<u8>, locale: Option<&str>) -> Result<(Status, PhoneStart), AuthyError> {
-    let mut params: Vec<(String, String)> = vec![];
-    params.push(("via".into(), via.to_string()));
-    params.push(("country_code".into(), country_code.to_string()));
-    params.push(("phone_number".into(), phone.into()));
-    if let Some(code_length) = code_length {
-        params.push(("code_length".into(), code_length.to_string()));
-    };
-    if let Some(locale) = locale {
-        params.push(("locale".into(), locale.into()));
-    };
-
-    let (status, res) = client.post(PREFIX, "phones/verification/start", None, Some(params))?;
-    let phone_verification = serde_json::from_value(res)?;
-
-    Ok((status, phone_verification))
-}
-
-pub fn check(client: &Client, country_code: u16, phone: &str, code: &str) -> Result<Status, AuthyError> {
-    let mut params: Vec<(String, String)> = vec![];
-    params.push(("country_code".into(), country_code.to_string()));
-    params.push(("phone_number".into(), phone.into()));
-    params.push(("verification_code".into(), code.into()));
-
-    let (status, _) = client.get(PREFIX, "phones/verification/check", Some(params))?;
-
-    Ok(status)
+        Ok(())
+    }
 }

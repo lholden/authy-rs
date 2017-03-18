@@ -1,7 +1,18 @@
 [package]
 name = "authy"
-version = "0.1.0"
+version = "0.9.0"
 authors = ["Lori Holden <noreply@loriholden.com>"]
+description = "Bindings for the Authy two factor web service."
+
+documentation = "https://docs.rs/authy/"
+repository = "https://github.com/lholden/authy-rs"
+
+license = "MIT"
+
+readme = "README.md"
+
+keywords = ["authy", "2FA", "two factor", "bindings"]
+categories = ["authentication", "web-programming::http-client"]
 
 [dependencies]
 reqwest = "*"
