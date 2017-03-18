@@ -11,7 +11,7 @@ license = "MIT"
 
 readme = "README.md"
 
-keywords = ["authy", "2FA", "two factor", "bindings"]
+keywords = ["authy", "2FA", "two", "factor", "bindings"]
 categories = ["authentication", "web-programming::http-client"]
 
 [dependencies]
