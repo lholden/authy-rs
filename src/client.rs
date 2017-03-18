@@ -30,7 +30,7 @@ impl Client {
     pub fn new(api_url: &str, api_key: &str) -> Client {
         Client {
             retry_count: 3,
-            retry_wait: 200,
+            retry_wait: 250,
             api_url: api_url.into(), 
             api_key: api_key.into(),
             reqwest: reqwest::Client::new().expect("A reqwest client"),
@@ -91,11 +91,11 @@ impl Client {
                 Err(_) => {
                     match res.status() {
                         &StatusCode::ServiceUnavailable => {
+                            count -= 1;
                             if count == 0 {
                                 return Err(AuthyError::ServiceUnavailable);
                             }
                             else {
-                                count -= 1;
                                 thread::sleep(Duration::from_millis(self.retry_wait.into()));
                                 continue;
                             }
