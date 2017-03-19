@@ -15,6 +15,7 @@ mod onetouch {
     fn request() {
         let mut c = Client::new(API_URL, API_KEY);
         c.retry_wait = 3000;
+        c.retry_count = 10;
         let (status, user) = user::new(&c, "user@domain.com", 54, "317-338-9302", false).expect("User to be created");
         assert!(status.success);
 
