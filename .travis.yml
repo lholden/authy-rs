@@ -3,5 +3,5 @@ rust:
   - stable
 script:
   - cargo build
-  - cargo test
+  - cargo test -j 1
   - cargo doc
