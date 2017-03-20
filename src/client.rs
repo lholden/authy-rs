@@ -8,9 +8,16 @@ use serde_json::{self, Value};
 
 use error::AuthyError;
 
+/// The Authy REST client.
+///
+/// This allows the rest of this library to interact with the Authy API service.
 #[derive(Debug)]
 pub struct Client {
+    /// Configure the client to retry the request `retry_count` number of times
+    /// when the service is unavailable.
     pub retry_count: u8,
+
+    /// Duration of time to wait between retry attempts.
     pub retry_wait: u16,
 
     api_url: String,
@@ -18,6 +25,7 @@ pub struct Client {
     reqwest: reqwest::Client,
 }
 
+/// Status message returned by every API request.
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Status {
     pub success: bool,
@@ -27,6 +35,7 @@ pub struct Status {
 }
 
 impl Client {
+    /// Create a new client to the Authy service.
     pub fn new(api_url: &str, api_key: &str) -> Client {
         Client {
             retry_count: 3,
@@ -37,10 +46,14 @@ impl Client {
         }
     }
 
+    /// Send a `get` request to the Authy service. This is intended to be used
+    /// by the library and not the user.
     pub fn get(&self, prefix: &str, path: &str, url_params: Option<Vec<(String, String)>>) -> Result<(Status, Value), AuthyError> {
         self.request(Method::Get, self.url(prefix, path, url_params), None)
     }
 
+    /// Send a `post` request to the Authy service. This is intended to be used
+    /// by the library and not the user.
     pub fn post(&self, prefix: &str, path: &str, url_params: Option<Vec<(String, String)>>, post_params: Option<Vec<(String, String)>>) -> Result<(Status, Value), AuthyError> {
         self.request(Method::Post, self.url(prefix, path, url_params), post_params)
     }

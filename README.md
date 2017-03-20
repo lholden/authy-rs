@@ -16,12 +16,48 @@ Be sure to add the authy crate to your `Cargo.toml`:
 authy = "*"
 ```
 
-Usage example:
+
+'low-level' Usage example:
 
 ```rust
 extern crate authy;
-use authy::Client;
-use authy::user::User;
+use authy::{Client, AuthyError};
+use authy::api::user;
+
+fn main() {
+    let api_url = "https://sandbox-api.authy.com";
+    let api_key = "bf12974d70818a08199d17d5e2bae630";
+
+    let c = Client::new(api_url, api_key);
+
+    let country_code = 1;
+    let email = "user@domain.com";
+    let phone = "949-555-1234";
+
+    let (_, user) = user::create(&c, email, country_code, phone, true).unwrap();
+   
+    println!("We have a user: {:#?}", user);
+
+    let code = "000000"; // Pretend user has provided a valid code
+    match user::verify(&c, user.id, code) {
+        Ok(_) => println!("Congrats on being validated!"),
+        Err(AuthyError::UnauthorizedKey(e)) => println!("Token provided by the user was wrong"),
+        Err(e) => println!("Some server error: {:?}", e),
+    };
+
+    // Lets send out a sms token just for fun
+    // Must be using a real API key on the production authy server for this to
+    // actually send out anything.
+    user::sms(&c, user.id, true, Some("login"), Some("Authy documentation example login")).unwrap();
+}
+```
+
+
+'high-level' Usage example:
+
+```rust
+extern crate authy;
+use authy::{Client, User};
 
 fn main() {
     let api_url = "https://sandbox-api.authy.com";

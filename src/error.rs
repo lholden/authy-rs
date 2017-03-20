@@ -6,19 +6,40 @@ use serde_json;
 
 use client::Status;
 
+/// The error type used by this library.
 #[derive(PartialEq, Eq, Clone, Debug)]
 pub enum AuthyError {
+    /// There was an error with the request.
     BadRequest(Status),            // 400
+
+    /// Either the API key or the verification token was invalid.
     UnauthorizedKey(Status),       // 401
+
+    /// This account does not have access to the requested service.
     Forbidden(Status),             // 403
+
+    /// The authy user could not be found
     UserNotFound(Status),          // 404
+
+    /// You have reached the API usage limit.
     TooManyRequests(Status),       // 429
+
+    /// There was an internal server error.
     InternalServerError(Status),   // 500
+
+    /// The authy service was unavailable. Only returned after the configured `retry_count`.
     ServiceUnavailable,            // 503
 
+    /// There was an IO error.
     IoError(String),
+
+    /// There was an error deserializing a json object.
     JsonParseError(String),
+
+    /// We made a request the server didn't like.
     RequestError(String),
+
+    /// The server gave an invalid response.
     InvalidServerResponse,
 }
 

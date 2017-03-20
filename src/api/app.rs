@@ -1,3 +1,7 @@
+//! Bindings to app portions of the [Authy TOTP service api](https://www.twilio.com/docs/api/authy/authy-totp).
+//!
+//! Much of the documentation for this module comes from the Authy TOTP service
+//! documentation.
 use serde_json;
 
 use error::AuthyError;
@@ -5,6 +9,7 @@ use client::{Client, Status};
 
 const PREFIX: &'static str = "protected";
 
+/// returned when requesting the application details
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Details {
     pub app_id: u32,
@@ -14,6 +19,7 @@ pub struct Details {
     pub sms_enabled: bool,
 }
 
+/// returned when requesting the application stats.
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Stats {
     pub month: String,
@@ -26,6 +32,10 @@ pub struct Stats {
     pub users_count: u32,
 }
 
+/// Get the details for an Authy application.
+///
+/// Please see the Authy documentation for more details:
+/// https://www.twilio.com/docs/api/authy/authy-totp#application-details
 pub fn details(client: &Client) -> Result<(Status, Details), AuthyError> {
     let (status, res) = client.get(PREFIX, "app/details", None)?;
 
@@ -34,6 +44,10 @@ pub fn details(client: &Client) -> Result<(Status, Details), AuthyError> {
     Ok((status, details))
 }
 
+/// Get stats for an Authy application.
+///
+/// Please see the Authy documentation for more details:
+/// https://www.twilio.com/docs/api/authy/authy-totp#application-stats
 pub fn stats(client: &Client) -> Result<(Status, Vec<Stats>), AuthyError> {
     let (status, res) = client.get(PREFIX, "app/stats", None)?;
 

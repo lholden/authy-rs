@@ -15,7 +15,7 @@ mod user {
         let mut c = Client::new(API_URL, API_KEY);
         c.retry_wait = 3000;
         c.retry_count = 10;
-        let (status, _) = user::new(&c, "user@domain.com", 54, "317-338-9302", false).expect("User to be created");
+        let (status, _) = user::create(&c, "user@domain.com", 54, "317-338-9302", false).expect("User to be created");
 
         assert!(status.success);
     }
@@ -25,7 +25,7 @@ mod user {
         let mut c = Client::new(API_URL, API_KEY);
         c.retry_wait = 3000;
         c.retry_count = 10;
-        let res = user::new(&c, "domain.com", 54, "317-338-9302", false);
+        let res = user::create(&c, "domain.com", 54, "317-338-9302", false);
         
         match res {
             Err(AuthyError::BadRequest(Status{success, message, ..})) => {
@@ -41,7 +41,7 @@ mod user {
         let mut c = Client::new(API_URL, API_KEY);
         c.retry_wait = 3000;
         c.retry_count = 10;
-        let (status, user) = user::new(&c, "user2341@domain.com", 54, "317-338-2341", false).expect("User to be created");
+        let (status, user) = user::create(&c, "user2341@domain.com", 54, "317-338-2341", false).expect("User to be created");
         assert!(status.success);
 
         let status = user::delete(&c, user.id).expect("User to be deleted");
@@ -69,7 +69,7 @@ mod user {
         let mut c = Client::new(API_URL, API_KEY);
         c.retry_wait = 3000;
         c.retry_count = 10;
-        let (status, user) = user::new(&c, "user@domain.com", 54, "317-338-9302", false).expect("User to be created");
+        let (status, user) = user::create(&c, "user@domain.com", 54, "317-338-9302", false).expect("User to be created");
         assert!(status.success);
 
         let (status, user_status) = user::status(&c, user.id).expect("User to have a status");
@@ -83,7 +83,7 @@ mod user {
         let mut c = Client::new(API_URL, API_KEY);
         c.retry_wait = 3000;
         c.retry_count = 10;
-        let (status, user) = user::new(&c, "user@domain.com", 54, "317-338-9302", false).expect("User to be created");
+        let (status, user) = user::create(&c, "user@domain.com", 54, "317-338-9302", false).expect("User to be created");
         assert!(status.success);
 
         let status = user::verify(&c, user.id, "0000000").expect("Valid token");
@@ -95,7 +95,7 @@ mod user {
         let mut c = Client::new(API_URL, API_KEY);
         c.retry_wait = 3000;
         c.retry_count = 10;
-        let (status, user) = user::new(&c, "user@domain.com", 54, "317-338-9302", false).expect("User to be created");
+        let (status, user) = user::create(&c, "user@domain.com", 54, "317-338-9302", false).expect("User to be created");
         assert!(status.success);
 
         let res = user::verify(&c, user.id, "123456");
@@ -114,7 +114,7 @@ mod user {
         let mut c = Client::new(API_URL, API_KEY);
         c.retry_wait = 3000;
         c.retry_count = 10;
-        let (status, user) = user::new(&c, "user@domain.com", 54, "317-338-9302", false).expect("User to be created");
+        let (status, user) = user::create(&c, "user@domain.com", 54, "317-338-9302", false).expect("User to be created");
         assert!(status.success);
 
         let (status, sms) = user::sms(&c, user.id, false, None, None).expect("Phone");
@@ -128,7 +128,7 @@ mod user {
         let mut c = Client::new(API_URL, API_KEY);
         c.retry_wait = 3000;
         c.retry_count = 10;
-        let (status, user) = user::new(&c, "user@domain.com", 54, "317-338-9302", false).expect("User to be created");
+        let (status, user) = user::create(&c, "user@domain.com", 54, "317-338-9302", false).expect("User to be created");
         assert!(status.success);
 
         let (status, sms) = user::sms(&c, user.id, true, Some("an_action"), Some("a_message")).expect("Phone");
@@ -142,7 +142,7 @@ mod user {
         let mut c = Client::new(API_URL, API_KEY);
         c.retry_wait = 3000;
         c.retry_count = 10;
-        let (status, user) = user::new(&c, "user@domain.com", 54, "317-338-9302", false).expect("User to be created");
+        let (status, user) = user::create(&c, "user@domain.com", 54, "317-338-9302", false).expect("User to be created");
         assert!(status.success);
 
         let (status, sms) = user::call(&c, user.id, false, None, None).expect("Phone");
@@ -156,7 +156,7 @@ mod user {
         let mut c = Client::new(API_URL, API_KEY);
         c.retry_wait = 3000;
         c.retry_count = 10;
-        let (status, user) = user::new(&c, "user@domain.com", 54, "317-338-9302", false).expect("User to be created");
+        let (status, user) = user::create(&c, "user@domain.com", 54, "317-338-9302", false).expect("User to be created");
         assert!(status.success);
 
         let (status, sms) = user::call(&c, user.id, true, Some("an_action"), Some("a_message")).expect("Phone");
@@ -172,7 +172,7 @@ mod user {
         let mut c = Client::new(API_URL, API_KEY);
         c.retry_wait = 3000;
         c.retry_count = 10;
-        let (status, user) = user::new(&c, "user@domain.com", 54, "317-338-9302", false).expect("User to be created");
+        let (status, user) = user::create(&c, "user@domain.com", 54, "317-338-9302", false).expect("User to be created");
         assert!(status.success);
 
 
