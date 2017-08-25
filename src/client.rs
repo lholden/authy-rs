@@ -82,13 +82,23 @@ impl Client {
 
             let mut body = String::new();
             res.read_to_string(&mut body)?;
-            println!("{}", body);
 
             // I wish could just check the content type but authy mixes json
             // and html content types when returning valid json.
             match serde_json::from_str::<Value>(&body) {
-                Ok(value) => {
-                    let status: Status = serde_json::from_str(&body)?;
+                Ok(mut value) => {
+                    // It seems that for whatever reason at least one call is returning
+                    // a *string* of a bool rather than a bool for success.
+                    value["success"] = match value.clone()["success"] {
+                        Value::Bool(v) => Value::Bool(v),
+                        Value::String(ref v) => match v.as_ref() {
+                            "true" => Value::Bool(true),
+                            _ => Value::Bool(false),
+                        },
+                        _ => Value::Bool(false),
+                    };
+
+                    let status: Status = serde_json::from_value(value.clone())?;
 
                     match res.status() {
                         StatusCode::Ok => return Ok((status, value)),

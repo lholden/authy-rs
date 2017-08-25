@@ -15,7 +15,7 @@ pub struct Phone {
     pub country_code: u16,
     pub phone_number: String,
     pub phone_type: String,
-    pub provider: String,
+    pub provider: Option<String>,
     pub ported: bool,
 }
 
@@ -30,8 +30,8 @@ impl Phone {
         Ok(Phone {
             country_code: country_code,
             phone_number: phone.into(),
-            phone_type: info.phone_type, 
-            provider: info.provider, 
+            phone_type: info.phone_type,
+            provider: info.provider,
             ported: info.ported
         })
     }

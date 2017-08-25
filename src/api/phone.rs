@@ -19,7 +19,7 @@ pub struct PhoneInfo {
     pub phone_type: String,
 
     /// Name of the service provider.
-    pub provider: String,
+    pub provider: Option<String>,
 
     /// Whether the phone number was ported or not.
     pub ported: bool,

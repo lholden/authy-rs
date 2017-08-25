@@ -91,7 +91,7 @@ impl User {
         Ok(())
     }
 
-    /// Perform a verification request. Returns Ok(true) for a successful 
+    /// Perform a verification request. Returns Ok(true) for a successful
     /// verification and Ok(false) when the verification code was invalid.
     ///
     /// Please see [api::user::verify](../api/user/fn.verify.html)
@@ -102,14 +102,14 @@ impl User {
                 self.update(c)?;
                 Ok(true)
             }
-            Err(AuthyError::UnauthorizedKey(Status { ref message,.. })) 
-                if message == "Token is invalid" => Ok(false), 
+            Err(AuthyError::UnauthorizedKey(Status { ref message,.. }))
+                if message == "Token is invalid" => Ok(false),
             Err(e) => Err(e)
         }
     }
 
-    /// Requests that the Authy service send the user a verification code over 
-    /// SMS. This request will be ignored if the user is using the Authy 
+    /// Requests that the Authy service send the user a verification code over
+    /// SMS. This request will be ignored if the user is using the Authy
     /// Mobile app unless force is set to true.
     ///
     /// Please see [api::user::sms](../api/user/fn.sms.html)
