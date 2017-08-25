@@ -74,10 +74,10 @@ impl Client {
         loop {
             let url = url.clone();
             let mut headers = Headers::new();
-            headers.set_raw("X-Authy-API-Key", vec![self.api_key.clone().into()]);
+            headers.set_raw("X-Authy-API-Key", self.api_key.clone());
             let mut res = match params.clone() {
-                Some(p) => self.reqwest.request(method.clone(), url).headers(headers).form(&p).send()?,
-                None => self.reqwest.request(method.clone(), url).headers(headers).send()?,
+                Some(p) => self.reqwest.request(method.clone(), url)?.headers(headers).form(&p)?.send()?,
+                None => self.reqwest.request(method.clone(), url)?.headers(headers).send()?,
             };
 
             let mut body = String::new();
@@ -91,19 +91,19 @@ impl Client {
                     let status: Status = serde_json::from_str(&body)?;
 
                     match res.status() {
-                        &StatusCode::Ok => return Ok((status, value)),
-                        &StatusCode::BadRequest => return Err(AuthyError::BadRequest(status)),
-                        &StatusCode::Unauthorized => return Err(AuthyError::UnauthorizedKey(status)),
-                        &StatusCode::Forbidden => return Err(AuthyError::Forbidden(status)),
-                        &StatusCode::TooManyRequests => return Err(AuthyError::TooManyRequests(status)),
-                        &StatusCode::NotFound => return Err(AuthyError::UserNotFound(status)),
-                        &StatusCode::InternalServerError => return Err(AuthyError::InternalServerError(status)),
+                        StatusCode::Ok => return Ok((status, value)),
+                        StatusCode::BadRequest => return Err(AuthyError::BadRequest(status)),
+                        StatusCode::Unauthorized => return Err(AuthyError::UnauthorizedKey(status)),
+                        StatusCode::Forbidden => return Err(AuthyError::Forbidden(status)),
+                        StatusCode::TooManyRequests => return Err(AuthyError::TooManyRequests(status)),
+                        StatusCode::NotFound => return Err(AuthyError::UserNotFound(status)),
+                        StatusCode::InternalServerError => return Err(AuthyError::InternalServerError(status)),
                         s => panic!("Status code not covered in authy REST specification: {}", s),
                     };
                 },
                 Err(_) => {
                     match res.status() {
-                        &StatusCode::ServiceUnavailable => {
+                        StatusCode::ServiceUnavailable => {
                             count -= 1;
                             if count == 0 {
                                 return Err(AuthyError::ServiceUnavailable);
