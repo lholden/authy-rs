@@ -1,3 +1,4 @@
+use std::error;
 use std::io;
 use std::fmt;
 
@@ -10,25 +11,25 @@ use client::Status;
 #[derive(PartialEq, Eq, Clone, Debug)]
 pub enum AuthyError {
     /// There was an error with the request.
-    BadRequest(Status),            // 400
+    BadRequest(Status), // 400
 
     /// Either the API key or the verification token was invalid.
-    UnauthorizedKey(Status),       // 401
+    UnauthorizedKey(Status), // 401
 
     /// This account does not have access to the requested service.
-    Forbidden(Status),             // 403
+    Forbidden(Status), // 403
 
     /// The authy user could not be found
-    UserNotFound(Status),          // 404
+    UserNotFound(Status), // 404
 
     /// You have reached the API usage limit.
-    TooManyRequests(Status),       // 429
+    TooManyRequests(Status), // 429
 
     /// There was an internal server error.
-    InternalServerError(Status),   // 500
+    InternalServerError(Status), // 500
 
     /// The authy service was unavailable. Only returned after the configured `retry_count`.
-    ServiceUnavailable,            // 503
+    ServiceUnavailable, // 503
 
     /// There was an IO error.
     IoError(String),
@@ -43,6 +44,27 @@ pub enum AuthyError {
     InvalidServerResponse,
 }
 
+impl error::Error for AuthyError {
+    fn description(&self) -> &str {
+        use AuthyError::*;
+        match *self {
+            BadRequest(_) => "400 bad request",
+            UnauthorizedKey(_) => "401 unauthorized",
+            Forbidden(_) => "403 forbidden",
+            UserNotFound(_) => "404 not found",
+            TooManyRequests(_) => "429 too many requests",
+            InternalServerError(_) => "500 internal server error",
+            ServiceUnavailable => "503 service unavailable",
+            IoError(_) => "IO error",
+            JsonParseError(_) => "JSON parse error",
+            RequestError(_) => "Request error",
+            InvalidServerResponse => "Invalid server response",
+        }
+    }
+    fn cause(&self) -> Option<&error::Error> {
+        None
+    }
+}
 
 impl fmt::Display for AuthyError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
