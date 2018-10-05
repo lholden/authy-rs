@@ -108,7 +108,7 @@ impl Client {
                         StatusCode::TooManyRequests => return Err(AuthyError::TooManyRequests(status)),
                         StatusCode::NotFound => return Err(AuthyError::UserNotFound(status)),
                         StatusCode::InternalServerError => return Err(AuthyError::InternalServerError(status)),
-                        s => panic!("Status code not covered in authy REST specification: {}", s),
+                        s => return Err(AuthyError::UnknownServerResponse(format!("Status code not covered in authy REST specification: {}", s))),
                     };
                 },
                 Err(_) => {

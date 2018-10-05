@@ -43,6 +43,5 @@ mod api_app {
         c.retry_count = 10;
         let (status, stats) = app::stats(&c).expect("Stats of authy app");
         assert!(status.success);
-        stats.iter().find(|s| s.month == "February" && s.year == 2017).expect("Find Feb of 2017");
     }
 }

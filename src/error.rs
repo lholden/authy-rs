@@ -42,6 +42,9 @@ pub enum AuthyError {
 
     /// The server gave an invalid response.
     InvalidServerResponse,
+
+    /// Server responded with something we don't know how to make use of.
+    UnknownServerResponse(String),
 }
 
 impl error::Error for AuthyError {
@@ -59,6 +62,7 @@ impl error::Error for AuthyError {
             JsonParseError(_) => "JSON parse error",
             RequestError(_) => "Request error",
             InvalidServerResponse => "Invalid server response",
+            UnknownServerResponse(_) => "Unknown server response"
         }
     }
     fn cause(&self) -> Option<&error::Error> {
@@ -82,6 +86,7 @@ impl fmt::Display for AuthyError {
             JsonParseError(ref s) => write!(f, "Json parsing error: {}", s),
             RequestError(ref s) => write!(f, "Request error: {}", s),
             InvalidServerResponse => write!(f, "Server returned an invalid response"),
+            UnknownServerResponse(ref s) => write!(f, "Server returned a response we don't know how to process: {}", s),
         }
     }
 }
