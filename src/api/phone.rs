@@ -28,8 +28,12 @@ pub struct PhoneInfo {
 /// Returned when initiating verification of a phone number.
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct PhoneStart {
-    pub is_ported: bool,
+    pub carrier: String,
     pub is_cellphone: bool,
+    pub message: String,
+    pub seconds_to_expire: u16,
+    pub uuid: Option<String>,
+    pub success: bool,
 }
 
 /// The contact type used when verifying a phone number
