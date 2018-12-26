@@ -1,6 +1,6 @@
 [package]
 name = "authy"
-version = "0.9.7"
+version = "0.9.8"
 authors = ["Lori Holden <noreply@loriholden.com>"]
 description = "Bindings for the Authy two factor web service."
 
@@ -15,7 +15,7 @@ keywords = ["authy", "2FA", "two", "factor", "bindings"]
 categories = ["authentication", "web-programming::http-client"]
 
 [dependencies]
-reqwest = "0.9"
-serde = "1.0"
-serde_derive = "1.0"
-serde_json = "1.0"
+reqwest = "0.9.5"
+serde = "1.0.82"
+serde_derive = "1.0.82"
+serde_json = "1.0.33"
