@@ -29,7 +29,8 @@ mod phone {
         c.retry_count = 10;
         let (status, info) = phone::start(&c, ContactType::SMS, 54, "317-338-9302", None, None).expect("PhoneVerification");
         assert!(status.success);
-        assert!(! info.is_ported);
+        assert_eq!(info.carrier, "Google Voice");
+        assert_eq!(info.message, "Text message sent to +54 317-338-9302.");
     }
 
 
